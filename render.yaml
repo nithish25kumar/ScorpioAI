@@ -2,7 +2,7 @@ services:
   - type: web
     name: chatbot-backend
     runtime: docker
-    dockerfilePath: ./backend/Dockerfile
+    dockerfilePath: ./Dockerfile
     dockerContext: ./backend
     plan: free
     envVars:

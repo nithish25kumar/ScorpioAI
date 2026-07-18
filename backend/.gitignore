@@ -1,0 +1,8 @@
+@"
+.env
+chroma_db/
+venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+"@ | Out-File -Encoding utf8 backend\.gitignore

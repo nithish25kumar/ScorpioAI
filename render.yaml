@@ -2,8 +2,9 @@ services:
   - type: web
     name: chatbot-backend
     runtime: docker
+    rootDir: backend
     dockerfilePath: ./Dockerfile
-    dockerContext: ./backend
+    dockerContext: .
     plan: free
     envVars:
       - key: LLM_API_KEY

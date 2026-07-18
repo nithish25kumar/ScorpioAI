@@ -69,7 +69,7 @@ class _ChatScreenState extends State<ChatScreen> {
   //   iOS simulator / macOS -> http://127.0.0.1:8000
   //   Physical device       -> http://<your-computer-LAN-IP>:8000
   //   Deployed backend      -> https://your-app.onrender.com
-  static const String backendBase = "http://10.255.97.235:8000";
+  static const String backendBase = "https://chatbot-backend-f9d6.onrender.com";
 
   @override
   void initState() {

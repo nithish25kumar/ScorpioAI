@@ -12,6 +12,6 @@ void main() {
     await tester.pumpWidget(const ChatApp());
 
     expect(find.byType(TextField), findsOneWidget);
-    expect(find.byIcon(Icons.send), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_upward_rounded), findsOneWidget);
   });
 }

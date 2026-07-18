@@ -32,9 +32,6 @@ jobs:
 
   flutter-test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: flutter_app
     steps:
       - uses: actions/checkout@v4
 

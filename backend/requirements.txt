@@ -8,3 +8,5 @@ chromadb>=0.5
 pypdf>=4.3
 pytest>=8.0
 python-multipart>=0.0.9
+
+PyJWT>=2.9

@@ -9,14 +9,6 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 import '../services/auth_service.dart';
 
-// ─────────────────────────────────────────────────────────────────────────
-// Design tokens
-// Palette: warm-neutral canvas + a single deep-teal accent. Chosen instead
-// of the default cream/terracotta or near-black/neon combos so the app
-// doesn't read as templated. Manrope carries headers and UI chrome; Inter
-// carries message text, since it's built for long-form on-screen reading.
-// ─────────────────────────────────────────────────────────────────────────
-
 const Color _kCanvas = Color(0xFFF7F5F2);
 const Color _kSurface = Color(0xFFFFFFFF);
 const Color _kInk = Color(0xFF1C1B1F);
@@ -54,9 +46,14 @@ bool _looksLikeError(String content) {
 class ChatScreen extends StatefulWidget {
   final AuthService authService;
   final VoidCallback onLogout;
+  final String backendBase;
 
-  const ChatScreen(
-      {super.key, required this.authService, required this.onLogout});
+  const ChatScreen({
+    super.key,
+    required this.authService,
+    required this.onLogout,
+    required this.backendBase,
+  });
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -80,12 +77,6 @@ class _ChatScreenState extends State<ChatScreen> {
   final FlutterTts _tts = FlutterTts();
   bool _speakReplies = false;
 
-  // IMPORTANT — pick the right host for where you're running the app:
-  //   Android emulator      -> http://10.0.2.2:8000
-  //   iOS simulator / macOS -> http://127.0.0.1:8000
-  //   Physical device       -> http://<your-computer-LAN-IP>:8000
-  //   Deployed backend      -> https://your-app.onrender.com
-  static const String backendBase = "http://10.255.97.155:8001";
   @override
   void initState() {
     super.initState();
@@ -110,10 +101,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
     try {
       final headers = await _authHeaders();
-      final uri = Uri.parse("$backendBase/chat/history");
+      final uri = Uri.parse("${widget.backendBase}/chat/history");
       final response = await http
           .get(uri, headers: headers)
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 60));
 
       if (response.statusCode == 200 && mounted) {
         final data = jsonDecode(response.body);
@@ -197,7 +188,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     setState(() => _uploading = true);
     try {
-      final uri = Uri.parse("$backendBase/ingest/file");
+      final uri = Uri.parse("${widget.backendBase}/ingest/file");
       final request = http.MultipartRequest("POST", uri);
       request.headers.addAll(await _authHeaders());
       request.files.add(
@@ -257,7 +248,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final buffer = StringBuffer();
 
     try {
-      final uri = Uri.parse("$backendBase/chat");
+      final uri = Uri.parse("${widget.backendBase}/chat");
       final request = http.Request("POST", uri);
       request.headers["Content-Type"] = "application/json";
       request.headers.addAll(await _authHeaders());
@@ -268,7 +259,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
       final streamedResponse = await http.Client()
           .send(request)
-          .timeout(const Duration(seconds: 30));
+          .timeout(const Duration(seconds: 60));
 
       if (streamedResponse.statusCode != 200) {
         setState(() {

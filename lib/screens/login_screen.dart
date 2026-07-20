@@ -3,8 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../services/auth_service.dart';
 
-// Same palette as chat_screen.dart, duplicated locally so this file has
-// no dependency on chat screen internals.
 const Color _kCanvas = Color(0xFFF7F5F2);
 const Color _kSurface = Color(0xFFFFFFFF);
 const Color _kInk = Color(0xFF1C1B1F);
@@ -14,19 +12,28 @@ const Color _kDivider = Color(0xFFE7E3DC);
 const Color _kDanger = Color(0xFFB3261E);
 const Color _kDangerSoft = Color(0xFFFBEAE9);
 
-TextStyle _display({double size = 18, FontWeight weight = FontWeight.w600, Color color = _kInk}) {
-  return GoogleFonts.manrope(fontSize: size, fontWeight: weight, color: color, height: 1.2);
+TextStyle _display(
+    {double size = 18,
+    FontWeight weight = FontWeight.w600,
+    Color color = _kInk}) {
+  return GoogleFonts.manrope(
+      fontSize: size, fontWeight: weight, color: color, height: 1.2);
 }
 
-TextStyle _body({double size = 15, FontWeight weight = FontWeight.w400, Color color = _kInk}) {
-  return GoogleFonts.inter(fontSize: size, fontWeight: weight, color: color, height: 1.4);
+TextStyle _body(
+    {double size = 15,
+    FontWeight weight = FontWeight.w400,
+    Color color = _kInk}) {
+  return GoogleFonts.inter(
+      fontSize: size, fontWeight: weight, color: color, height: 1.4);
 }
 
 class LoginScreen extends StatefulWidget {
   final AuthService authService;
   final VoidCallback onAuthenticated;
 
-  const LoginScreen({super.key, required this.authService, required this.onAuthenticated});
+  const LoginScreen(
+      {super.key, required this.authService, required this.onAuthenticated});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -63,7 +70,8 @@ class _LoginScreenState extends State<LoginScreen> {
     } on AuthException catch (e) {
       setState(() => _error = e.message);
     } catch (e) {
-      setState(() => _error = "Couldn't reach the server. Is the backend running? ($e)");
+      setState(() =>
+          _error = "Couldn't reach the server. Is the backend running? ($e)");
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -97,8 +105,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: 56,
                     height: 56,
                     alignment: Alignment.center,
-                    decoration: const BoxDecoration(color: Color(0xFFE4EFEE), shape: BoxShape.circle),
-                    child: const Icon(Icons.auto_awesome_rounded, color: _kAccent, size: 26),
+                    decoration: const BoxDecoration(
+                        color: Color(0xFFE4EFEE), shape: BoxShape.circle),
+                    child: const Icon(Icons.auto_awesome_rounded,
+                        color: _kAccent, size: 26),
                   ),
                   const SizedBox(height: 20),
                   Text(
@@ -115,10 +125,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 28),
-
                   if (_error != null) ...[
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 12),
                       decoration: BoxDecoration(
                         color: _kDangerSoft,
                         borderRadius: BorderRadius.circular(12),
@@ -127,15 +137,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.error_outline_rounded, size: 18, color: _kDanger),
+                          const Icon(Icons.error_outline_rounded,
+                              size: 18, color: _kDanger),
                           const SizedBox(width: 8),
-                          Expanded(child: Text(_error!, style: _body(size: 13, color: _kDanger))),
+                          Expanded(
+                              child: Text(_error!,
+                                  style: _body(size: 13, color: _kDanger))),
                         ],
                       ),
                     ),
                     const SizedBox(height: 16),
                   ],
-
                   _AuthTextField(
                     controller: _emailController,
                     hint: "Email",
@@ -151,7 +163,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     onSubmitted: (_) => _submit(),
                   ),
                   const SizedBox(height: 20),
-
                   SizedBox(
                     height: 48,
                     child: ElevatedButton(
@@ -160,13 +171,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         backgroundColor: _kAccent,
                         foregroundColor: _kSurface,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14)),
                       ),
                       child: _loading
                           ? const SizedBox(
                               width: 20,
                               height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: _kSurface),
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: _kSurface),
                             )
                           : Text(
                               _isSignup ? "Sign up" : "Log in",
@@ -175,7 +188,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 14),
-
                   TextButton(
                     onPressed: _loading
                         ? null
@@ -190,20 +202,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: _body(size: 13, color: _kAccent),
                     ),
                   ),
-
                   const SizedBox(height: 8),
                   Row(
                     children: [
                       Expanded(child: Divider(color: _kDivider)),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Text("or", style: _body(size: 12, color: _kInkMuted)),
+                        child: Text("or",
+                            style: _body(size: 12, color: _kInkMuted)),
                       ),
                       Expanded(child: Divider(color: _kDivider)),
                     ],
                   ),
                   const SizedBox(height: 8),
-
                   TextButton(
                     onPressed: _loading ? null : _continueAsGuest,
                     child: Text(
@@ -257,7 +268,8 @@ class _AuthTextField extends StatelessWidget {
           hintStyle: _body(size: 15, color: _kInkMuted),
           prefixIcon: Icon(icon, size: 20, color: _kInkMuted),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
         ),
       ),
     );

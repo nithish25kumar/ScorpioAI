@@ -1,16 +1,12 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Handles signup/login/logout and local token storage.
-///
-/// Token is stored with shared_preferences for simplicity. Note: this is
-/// NOT encrypted storage — fine for a portfolio/demo project, but for a
-/// production app storing real user credentials you'd want
-/// flutter_secure_storage instead, which keeps the token in the
-/// platform keychain/keystore rather than plain SharedPreferences.
 class AuthService {
-  AuthService(this.backendBase);
+  AuthService(this.backendBase) {
+    debugPrint("[AuthService] initialized with backendBase = $backendBase");
+  }
 
   final String backendBase;
   static const _tokenKey = "auth_token";
@@ -35,53 +31,59 @@ class AuthService {
     await prefs.remove(_tokenKey);
   }
 
-  /// Throws an [AuthException] with a user-facing message on failure.
   Future<void> signup(String email, String password) async {
-    final uri = Uri.parse("$backendBase/auth/signup");
-    final response = await http
-        .post(
-          uri,
-          headers: {"Content-Type": "application/json"},
-          body: jsonEncode({"email": email, "password": password}),
-        )
-        .timeout(const Duration(seconds: 15));
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      await _saveToken(data["access_token"]);
-      return;
-    }
-
-    throw AuthException(_extractDetail(response));
+    await _authRequest("signup", "/auth/signup", email, password);
   }
 
   Future<void> login(String email, String password) async {
-    final uri = Uri.parse("$backendBase/auth/login");
-    final response = await http
-        .post(
-          uri,
-          headers: {"Content-Type": "application/json"},
-          body: jsonEncode({"email": email, "password": password}),
-        )
-        .timeout(const Duration(seconds: 15));
+    await _authRequest("login", "/auth/login", email, password);
+  }
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      await _saveToken(data["access_token"]);
-      return;
+  Future<void> _authRequest(
+    String label,
+    String path,
+    String email,
+    String password,
+  ) async {
+    final uri = Uri.parse("$backendBase$path");
+    debugPrint("[AuthService] $label -> POST $uri");
+
+    try {
+      final response = await http
+          .post(
+            uri,
+            headers: {"Content-Type": "application/json"},
+            body: jsonEncode({"email": email, "password": password}),
+          )
+          .timeout(const Duration(seconds: 60));
+
+      debugPrint("[AuthService] $label <- status ${response.statusCode}");
+      debugPrint("[AuthService] $label <- body ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        await _saveToken(data["access_token"]);
+        debugPrint("[AuthService] $label succeeded, token saved");
+        return;
+      }
+
+      throw AuthException(_extractDetail(response));
+    } on AuthException {
+      rethrow;
+    } catch (e) {
+      debugPrint("[AuthService] $label FAILED with exception: $e");
+
+      rethrow;
     }
-
-    throw AuthException(_extractDetail(response));
   }
 
   String _extractDetail(http.Response response) {
     try {
       final data = jsonDecode(response.body);
-      if (data is Map && data["detail"] != null)
+      if (data is Map && data["detail"] != null) {
         return data["detail"].toString();
-    } catch (_) {
-      // fall through to generic message
-    }
+      }
+    } catch (_) {}
     return "Something went wrong (${response.statusCode}). Please try again.";
   }
 }

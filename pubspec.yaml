@@ -12,7 +12,7 @@ dependencies:
   http: ^1.2.2
   speech_to_text: ^7.0.0
   flutter_tts: ^4.1.0
-  file_picker: ^8.1.2
+  file_picker: ^13.1.0
   google_fonts: ^6.2.1
   shared_preferences: ^2.3.2
 

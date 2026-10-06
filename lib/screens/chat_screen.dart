@@ -176,15 +176,14 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _pickAndUploadDocument() async {
-    final result = await FilePicker.platform.pickFiles(
+    final file = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ["txt", "pdf"],
-      withData: true,
     );
-    if (result == null || result.files.isEmpty) return;
+    if (file == null) return;
 
-    final file = result.files.first;
-    if (file.bytes == null) return;
+    final bytes = await file.readAsBytes();
+    if (bytes == null) return;
 
     setState(() => _uploading = true);
     try {
@@ -192,11 +191,11 @@ class _ChatScreenState extends State<ChatScreen> {
       final request = http.MultipartRequest("POST", uri);
       request.headers.addAll(await _authHeaders());
       request.files.add(
-        http.MultipartFile.fromBytes("file", file.bytes!, filename: file.name),
+        http.MultipartFile.fromBytes("file", bytes, filename: file.name),
       );
       final streamedResponse = await request.send().timeout(
-            const Duration(seconds: 60),
-          );
+        const Duration(seconds: 60),
+      );
       final response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode == 200) {
